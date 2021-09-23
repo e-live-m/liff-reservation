@@ -9,25 +9,26 @@ function initializeLiff(liffId) {
             liffId: liffId
         })
         .then(() => {
-             if (!liff.isInClient() && !liff.isLoggedIn()) {
+            // Webブラウザからアクセスされた場合は、LINEにログインする
+            if (!liff.isInClient() && !liff.isLoggedIn()) {
                 window.alert("LINEアカウントにログインしてください。");
-                liff.login();
+                liff.login({redirectUri: location.href});
             }
-       
         })
         .catch((err) => {
             console.log('LIFF Initialization failed ', err);
         });
 }
 
- function sendMessage(text) {
-     if (liff.isInClient()) {
-         sendMessages(text);
-     } else {
-         shareTargetPicker(text);
+function sendText(text) {
+    if (!liff.isInClient()) {
+        shareTargetPicker(text);
+    } else {
+        sendMessages(text);
     }
- }
+}
 
+// LINEトーク画面上でメッセージ送信
 function sendMessages(text) {
     liff.sendMessages([{
         'type': 'text',
@@ -39,11 +40,12 @@ function sendMessages(text) {
     });
 }
 
- function shareTargetPicker(text) {
-     liff.shareTargetPicker([{
+// Webブラウザからメッセージ送信
+function shareTargetPicker(text) {
+    liff.shareTargetPicker([{
         'type': 'text',
-         'text': text
-     }]).catch(function (error) {
-         window.alert('Failed to send message ' + error);
-     });
- }
+        'text': text
+    }]).catch(function (error) {
+        window.alert('Failed to send message ' + error);
+    });
+}
